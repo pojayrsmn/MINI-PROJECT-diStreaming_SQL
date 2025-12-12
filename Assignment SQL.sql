@@ -9,7 +9,8 @@ use diStreaming;
 CREATE TABLE users (
 	user_id INT AUTO_INCREMENT NOT NULL primary key,
     fullname VARCHAR(50) not null,
-    email varchar(100) not null unique,
+    email VARCHAR(50) not null unique,
+	password INT NOT NULL,
     created_at date
 ); 
 
@@ -17,16 +18,17 @@ CREATE TABLE users (
 CREATE TABLE movies (
 	movie_id INT auto_increment not null primary key,
     title VARCHAR(50) not null,
-    summary text not null,
+    description text not null,
     duration INT not null,
-    url_movie varchar(500) not null,
+    url_movie varchar(1000) not null,
     release_year YEAR NOT NULL
 ); 
 
 -- 3. buat table categories
 CREATE TABLE categories (
 	category_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    rating_id FLOAT NOT NULL 
+	category_name VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL
 );
 
 -- 4. buat table movie_history
@@ -34,7 +36,7 @@ CREATE TABLE movie_history (
 	watch_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     user_id INT NOT NULL,
     movie_id INT NOT NULL,
-    watched_till INT NOT NULL, -- terakhir di tonton di durasi menit ke berapa
+    history_watched INT NOT NULL, -- terakhir di tonton di durasi menit ke berapa
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- menunjukkan kapan waktu film di upload di website
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE
@@ -56,17 +58,17 @@ CREATE TABLE ratings(
     movie_id INT NOT NULL,
     user_id INT NOT NULL,
     score_rate decimal NOT NULL,
-    comment text NOT NULL,
+    comment TEXT NOT NULL,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 -- cek tabel
-DESCRIBE users;
-DESCRIBE categories;
-DESCRIBE movies;
-DESCRIBE movie_history;
-DESCRIBE ratings;
-DESCRIBE movie_category;
+DESC users;
+DESC categories;
+DESC movies;
+DESC movie_history;
+DESC ratings;
+DESC movie_category;
 
 
 -- INSERT DATA USER
@@ -112,8 +114,6 @@ INSERT INTO categories (category_name, detail) VALUES
 ('Biography', 'Mengisahkan kehidupan nyata seseorang seperti tokoh sejarah, selebriti, ilmuwan meski bisa ada dramatisasi untuk efek naratif'),
 ('Sport', 'Berpusat pada olahraga—baik kompetisi, pelatihan, atau perjuangan atlet. Menekankan semangat, kerja tim, dan kemenangan atas rintangan');
 
-desc movies;
-select * from movies;
 -- 3. Input data Tabel Movies
 
 INSERT INTO movies (title, summary, release_year, duration, url_movie) VALUES
@@ -183,8 +183,7 @@ INSERT INTO movie_history (user_id, movie_id, watched_till, updated_at) VALUES
 (14, 23, 43, '2025-11-29'),
 (15, 24, 25, '2025-11-29'),
 (16, 23, 44, '2025-11-29');
-desc ratings;
-select * from ratings;
+
 -- 5.Input data Tabel Ratings
 INSERT INTO ratings (user_id, movie_id, score_rate, comment) VALUES
 (1, 1, 9.0, 'Absolutely breathtaking. The cinematography alone is worth 5 stars'),
@@ -251,6 +250,15 @@ CREATE INDEX idx_mc_category_id ON movie_category(category_id); -- mencari film 
 CREATE INDEX idx_ratings_movie_id ON Ratings(movie_id); -- mencari rating berdasarkan film.
 CREATE INDEX idx_ratings_user_id ON Ratings(user_id); -- mencari rating yang diberikan oleh user tertentu
 
+-- cek data
+
+SELECT * FROM users;
+SELECT * FROM categories;
+SELECT * FROM movies;
+SELECT * FROM movie_history;
+SELECT * FROM ratings;
+SELECT * FROM movie_category;
+
 -- test pakai index --
 EXPLAIN
 SELECT *
@@ -269,16 +277,7 @@ SELECT *
 FROM Ratings
 WHERE movie_id = 9;
 
--- cek data
-
-SELECT * FROM users;
-SELECT * FROM categories;
-SELECT * FROM movies;
-SELECT * FROM movie_history;
-SELECT * FROM ratings;
-SELECT * FROM movie_category;
-
--- -------------------------SQL FUNDAMENTALS-------------------------------
+-- -------------------------SQL FUNDAMENTALS---------------------------- ---
 -- 1. Tampilkan seluruh film dari tabel Movies.
 SELECT * FROM movies;
 
